@@ -7,10 +7,14 @@
     color: red;
     margin-left: 0.5em;
 }
+.error.success{
+	color: green !important;
+}
+
 /*[ FONT SIZE ]
 ///////////////////////////////////////////////////////////
 */
-.fs-1 {font-size: 1px;}-
+.fs-1 {font-size: 1px;}
 .fs-2 {font-size: 2px;}
 .fs-3 {font-size: 3px;}
 .fs-4 {font-size: 4px;}

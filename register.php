@@ -1,5 +1,24 @@
 <?php
 session_start();
+
+$_servername = "localhost";
+$_username = "mahdi";
+$_password = "123456";
+$_dbname = "store";
+try {
+    $conn = new PDO("mysql:host=$_servername;dbname=$_dbname", $_username, $_password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // # echo "connection successful";
+
+    // $_command = "SELECT * FROM users;";
+    // $statement = $conn->prepare("$_command");
+    // $statement->execute();
+    // $result = $statement->setFetchMode(PDO::FETCH_ASSOC);
+    // # var_dump($result);
+
+} catch (PDOException $e) {
+    echo "connection failed" . $e->getMessage();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,24 +38,21 @@ session_start();
 
 <body>
     <?php
-    $name = $email = $password = $password2 = "";
-    $nameFlag = $emailFlag = $passwordFlag = false;
-    $nameError = $emailError = $passwordError = $password2Error = "";
+    $username = $email = $password = $password2 = "";
+    $usernameFlag = $emailFlag = $passwordFlag = false;
+    $usernameError = $emailError = $passwordError = $password2Error = "";
 
-    // $usersArray = [['name' => 'mahdi', 'email' => 'mh@gmail.com', 'password' => 123456789]];
-    // array_push($_SESSION['users'], $usersArray);
-    // $_SESSION['users'] = [['name' => 'mahdi', 'email' => 'mh@gmail.com', 'password' => '123456789']];
-
-
+    #check form submission
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
-        if (empty($_POST['name'])) {
-            $nameError = "Name is required";
+        #check username
+        if (empty($_POST['username'])) {
+            $usernameError = "Name is required";
         } else {
-            $name = trimInput($_POST['name']);
-            $nameFlag = true;
+            $username = trimInput($_POST['username']);
+            $usernameFlag = true;
         }
 
+        #check email
         if (empty($_POST['email'])) {
             $emailError = "Email is required";
         } else {
@@ -46,17 +62,11 @@ session_start();
                 $email = "";
             } else {
                 $email = trimInput($_POST['email']);
-                foreach ($_SESSION['users'] as $key => $value) {
-                    if ($value["email"] == $email) {
-                        $emailError = "Email already exist!";
-                        break;
-                    } else {
-                        $emailFlag = true;
-                    }
-                }
+                $emailFlag = true;
             }
         }
 
+        #check password
         if (empty($_POST['password'])) {
             $passwordError = "Password is required";
         } elseif (strlen(trimInput($_POST['password'])) < 8) {
@@ -65,6 +75,7 @@ session_start();
             $password = $_POST['password'];
         }
 
+        #check password2
         if (empty($_POST['password2'])) {
             $password2Error = "This field is required";
         } elseif (strlen(trimInput($_POST['password2'])) < 8) {
@@ -73,22 +84,26 @@ session_start();
             $password2 = $_POST['password2'];
         }
 
+        #check if they match
         if ($password !== $password2) {
             $password2 = "Passwords do not match!";
         } else {
             $passwordFlag = true;
         }
-
-        if ($nameFlag === true && $emailFlag === true && $passwordFlag === true) {
-            $newUser = ['name' => "$name", 'email' => "$email", 'password' => "$password"];
-            // $_SESSION['users'][] = $newUser;
-            array_push($_SESSION['users'], $newUser);
-            # or $_SESSION['users'][] = $newUser;
-            header("Location: ./login.php");
-            // echo "HI";
+        #if they do :
+        if ($usernameFlag === true && $emailFlag === true && $passwordFlag === true) {
+            #try to insert user into database
+            try {
+                $sqlCommand = "INSERT INTO users (username, email, password) VALUES ('$username', '$email', '$password')";
+                echo $conn->exec($sqlCommand);
+                echo "New record created successfully";
+                header("Location: ./login.php");
+            } catch (PDOException $e) {
+                #email duplicate
+                $emailError = "php error: email already exist";
+            }
         }
-    } #check if form is submitted
-
+    }
 
     function trimInput($data)
     {
@@ -106,12 +121,13 @@ session_start();
                 </div>
 
                 <form id="myForm" class="login100-form validate-form"
-                    action="<?php htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
+                    action="<?php htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST"
+                    onsubmit="return validateForm(event)">
                     <span class="login100-form-title">
                         Member Register
                     </span>
                     <div class="wrap-input100 validate-input" data-validate="Valid user is required: ex@abc.xyz">
-                        <input class="input100" type="text" name="name" placeholder="username">
+                        <input class="input100" id="username" type="text" name="username" placeholder="username">
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
                             <i class="fa fa-user" aria-hidden="true"></i>
@@ -119,16 +135,17 @@ session_start();
                         <span class="error">
                             <?php
                             echo "<span>";
-                            echo $nameError;
+                            echo $usernameError;
                             echo "</span>";
-
                             ?>
                         </span>
+                        <span class="error" id="usernameError"></span>
+
                     </div>
 
 
                     <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">
-                        <input class="input100" type="email" name="email" placeholder="Email">
+                        <input class="input100" id="email" type="email" name="email" placeholder="Email">
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
                             <i class="fa fa-envelope" aria-hidden="true"></i>
@@ -140,10 +157,12 @@ session_start();
                             echo "</span>";
                             ?>
                         </span>
+                        <span class="error" id="emailError"></span>
+
                     </div>
 
                     <div class="wrap-input100 validate-input" data-validate="Password is required">
-                        <input class="input100" type="password" name="password" placeholder="Password">
+                        <input class="input100" id="password" type="password" name="password" placeholder="Password">
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
                             <i class="fa fa-lock" aria-hidden="true"></i>
@@ -155,11 +174,13 @@ session_start();
                             echo "</span>";
                             ?>
                         </span>
+                        <span class="error" id="passwordError"></span>
 
                     </div>
 
                     <div class="wrap-input100 validate-input" data-validate="Password is required">
-                        <input class="input100" type="password" name="password2" placeholder="Confirm Password">
+                        <input class="input100" id="password2" type="password" name="password2"
+                            placeholder="Confirm Password">
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
                             <i class="fa fa-lock" aria-hidden="true"></i>
@@ -171,7 +192,7 @@ session_start();
                             echo "</span>";
                             ?>
                         </span>
-
+                        <span class="error" id="password2Error"></span>
                     </div>
 
                     <div class="container-login100-form-btn">
@@ -199,10 +220,94 @@ session_start();
             </div>
         </div>
     </div>
-    <script>
+    <!-- <script>
     const form = document.getElementById('myForm');
     form.preventDefault();
-    </script>
+    </script> -->
 </body>
 
 </html>
+
+<script type="text/javascript">
+const validateForm = (event) => {
+    const username = document.getElementById('username');
+    const usernameError = document.getElementById('usernameError');
+    const email = document.getElementById('email');
+    const emailError = document.getElementById('emailError');
+    const password = document.getElementById('password');
+    const passwordError = document.getElementById('passwordError');
+    const password2 = document.getElementById('password2');
+    const password2Error = document.getElementById('password2Error');
+    const flags = [];
+    // return true;
+    /* username */
+    if (username.value.trim().length === 0) {
+        usernameError.textContent = "JS username Can't be empty!";
+        flags.push(false);
+    } else {
+        // return true;
+        flags.push(true);
+        usernameError.classList.toggle('success')
+        usernameError.textContent = "JS no problem";
+    }
+
+    /**email */
+    if (email.value.trim().length === 0) {
+        emailError.textContent = "JS Email Can't be empty!";
+        flags.push(false);
+    } else if (!isEmail(email.value)) {
+        emailError.textContent = "JS Wrong Email fromat";
+        flags.push(false);
+    } else {
+        // return true;
+        flags.push(true);
+        emailError.textContent = "JS no problem";
+    }
+
+    /**password */
+    if (password.value.length === 0) {
+        passwordError.textContent = "JS Password can't be empty!";
+        flags.push(false);
+    } else if (password.value.length < 8) {
+        passwordError.textContent = "JS Password must be at least 8 characters";
+        flags.push(false);
+    } else {
+        passwordError.textContent = "JS no problem";
+        flags.push(true);
+    }
+
+
+    /**password 2 */
+    if (password2.value.length === 0) {
+        password2Error.textContent = "JS Password 2 can't be empty!";
+        flags.push(false);
+    } else if (password2.value.length < 8) {
+        password2Error.textContent = "JS Password must be at least 8 characters";
+        flags.push(false);
+    } else {
+        password2Error.textContent = "JS no problem";
+        flags.push(true);
+    }
+
+    if (password.value !== password2.value) {
+        password2Error.textContent = "Password doesn't match!";
+        flags.push(false);
+    } else {
+        password2Error.textContent = "JS no problem";
+        flags.push(true);
+    }
+
+    flags.forEach(flag => {
+        if (flag === false) {
+            event.preventDefault();
+            return false;
+        }
+    });
+    return true;
+}
+
+function isEmail(email) {
+    return /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        .test(email);
+}
+</script>

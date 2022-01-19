@@ -1,5 +1,26 @@
 <?php
 session_start();
+
+$_servername = "localhost";
+$_username = "mahdi";
+$_password = "123456";
+$_dbname = "store";
+try {
+    $conn = new PDO("mysql:host=$_servername;dbname=$_dbname", $_username, $_password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    # echo "connection successful";
+
+    // $_command = "SELECT * FROM users;";
+    // $statement = $conn->prepare("$_command");
+    // $statement->execute();
+    // $result = $statement->setFetchMode(PDO::FETCH_ASSOC);
+    // $users = $statement->fetchAll(); #get all users
+    // foreach (new RecursiveArrayIterator($users) as $k => $v) {
+    //     #echo
+    // }
+} catch (PDOException $e) {
+    echo "connection failed" . $e->getMessage();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -18,17 +39,9 @@ session_start();
 
 <body>
     <?php
-    // foreach ($_SESSION['users'] as $key => $value) {
-    //     // $value['users'];
-    //     // echo "$key => $value";
-    //     // $value['users'];
-    //     echo $value['name'];
-    // }
-
-    $name = $email = $password = "";
+    $email = $password = "";
     $emailError = $passwordError = "";
     $passwordFlag = $emailFlag = false;
-    // $loggedUser = array();
     $_SESSION['loggedUser'] = "";
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -42,14 +55,7 @@ session_start();
                 $email = "";
             } else {
                 $email = trimInput($_POST['email']);
-                foreach ($_SESSION['users'] as $key => $user) {
-                    if ($user['email'] === $email) {
-                        $emailFlag = true;
-                    }
-                    if ($emailFlag === false) {
-                        $emailError = "Email Doesn't exist";
-                    }
-                }
+                $emailFlag = true;
             }
         }
 
@@ -59,27 +65,35 @@ session_start();
             $passwordError = "'PHP 'Password can't be less than 8 charaters";
         } else {
             $password = $_POST['password'];
-            foreach ($_SESSION['users'] as $key => $user) {
-                if ($user['password'] === $password) {
-                    $passwordFlag = true;
-                    $name = $user['name'];
-                    // echo gettype($user['password']);
-                    // echo "<br>";
-                    // echo gettype($password);
-                }
-            }
+            $passwordFlag = true;
         }
-        echo "$emailFlag & $passwordFlag";
+        # echo "$emailFlag & $passwordFlag";
         if ($emailFlag === true && $passwordFlag === true) {
-            // header(location)
-            // echo "tru";
-            foreach ($_SESSION['users'] as $key => $value) {
-                if ($value['email'] == $email) {
-                    // array_push($loggedUser, $value);
-                    $_SESSION['loggedUser'] = $value;
+
+            $stmt = $conn->prepare("SELECT * FROM users WHERE email= '$email' and password='$password'");
+            $stmt->execute();
+
+            // set the resulting array to associative
+            $rslt = $stmt->setFetchMode(PDO::FETCH_ASSOC);
+            $rslt = $stmt->fetchAll();
+            if ($rslt[0]['email'] == $email && $rslt[0]['password'] == $password) {
+                $_SESSION['loggedUser'] = $rslt[0];
+                if ($rslt[0]['is_admin'] == true) {
+                    header("Location: ./cool-admin/");
+                } else {
+                    header("Location: ./welcome.php");
                 }
+            } else {
+                $passwordError = "invalid credintials";
             }
-            header("Location: ./welcome.php");
+
+            # old code
+            // foreach ($users as $key => $user) {
+            //     if ($user['email'] == $email) {
+            //         $_SESSION['loggedUser'] = $user;
+            //     }
+            // }
+            // header("Location: ./welcome.php");
         }
     }
     function trimInput($data)

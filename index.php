@@ -6,6 +6,33 @@ if (!isset($_SESSION['users'])) {
     ];
 }
 
+$_servername = "localhost";
+$_username = "mahdi";
+$_password = "123456";
+$_dbname = "store";
+try {
+    $conn = new PDO("mysql:host=$_servername;dbname=$_dbname", $_username, $_password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    echo "connection successful";
+
+    $_command = "SELECT * FROM users WHERE id = 1;";
+    $statement = $conn->prepare("$_command");
+    $statement->execute();
+    echo $result = $statement->setFetchMode(PDO::FETCH_ASSOC);
+    var_dump($result);
+    $user;
+    foreach (new RecursiveArrayIterator($statement->fetchAll()) as $k => $v) {
+        // echo "key = $k, value =  $v";
+        $user = $v;
+    }
+
+    foreach ($user as $key => $value) {
+        echo " key = $key, value =  $value <br/>";
+    }
+} catch (PDOException $e) {
+    echo "connection failed" . $e->getMessage();
+}
+// $conn = new PDO()
 ?>
 <!DOCTYPE html>
 <html lang="en">

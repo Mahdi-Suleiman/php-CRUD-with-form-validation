@@ -26,25 +26,51 @@ session_start();
 
                 <!-- <form class="login100-form validate-form"> -->
                 <span class="login100-form-title">
-                    Welcome <?php
-                            // echo $_SESSION['users']
-                            echo ($_SESSION['loggedUser']['name']);
-                            // var_dump($_SESSION)
-                            // echo $_POST['name'];
-                            ?>
 
-                    Your Email <?php
-                                echo ($_SESSION['loggedUser']['email']);
-                                // echo $_POST['email'];
-                                ?>
+                    <?php
+                    if (isset($_SESSION['loggedUser'])) {
+
+                        // echo $_SESSION['users']
+                        echo " Welcome " . ($_SESSION['loggedUser']['username']) . "<br/>";
+                        echo " Your Email " . ($_SESSION['loggedUser']['email']) . "<br/>";
+                        echo
+                        '
+                        <div class="container-login100-form-btn">
+                        <a href="./index.php" class="login100-form-btn">
+                            Go to home page
+                        </a>
+                    </div>
+                        ';
+                    } else {
+                        echo "You are not logged in!";
+                        echo
+                        '
+                        <div class="container-login100-form-btn">
+                        <a href="./index.php" class="login100-form-btn">
+                            Go to home page
+                        </a>
+                    </div>
+                        ';
+                    }
+
+                    // var_dump($_SESSION)
+                    // echo $_POST['name'];
+                    ?>
+
                 </span>
-
-
+                <!-- 
                 <div class="container-login100-form-btn">
                     <a href="./index.php" class="login100-form-btn">
                         Go to home page
                     </a>
                 </div>
+
+                <div class="container-login100-form-btn">
+                    <a href="./index.php" class="login100-form-btn">
+                        Not Logged in!
+
+                    </a>
+                </div> -->
 
 
                 <!-- <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">
