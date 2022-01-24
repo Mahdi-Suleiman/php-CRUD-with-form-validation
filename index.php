@@ -1,19 +1,19 @@
 <?php
 session_start();
-if (!isset($_SESSION['users'])) {
-    $_SESSION['users'] = [
-        ['name' => 'mahdi', 'email' => 'mh@gmail.com', 'password' => '123456789']
-    ];
-}
-
-$_servername = "localhost";
-$_username = "mahdi";
-$_password = "123456";
-$_dbname = "store";
+// if (!isset($_SESSION['users'])) {
+//     $_SESSION['users'] = [
+//         ['name' => 'mahdi', 'email' => 'mh@gmail.com', 'password' => '123456789']
+//     ];
+// }
+require('./config/config.php');
+// $_servername = "localhost";
+// $_username = "mahdi";
+// $_password = "123456";
+// $_dbname = "store";
 try {
-    $conn = new PDO("mysql:host=$_servername;dbname=$_dbname", $_username, $_password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    echo "connection successful";
+    // $conn = new PDO("mysql:host=$_servername;dbname=$_dbname", $_username, $_password);
+    // $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // echo "connection successful";
 
     $_command = "SELECT * FROM users WHERE id = 1;";
     $statement = $conn->prepare("$_command");
@@ -30,7 +30,7 @@ try {
         echo " key = $key, value =  $value <br/>";
     }
 } catch (PDOException $e) {
-    echo "connection failed" . $e->getMessage();
+    // echo "connection failed" . $e->getMessage();
 }
 // $conn = new PDO()
 ?>

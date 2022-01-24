@@ -1,26 +1,27 @@
 <?php
 session_start();
+require('./config/config.php');
 
-$_servername = "localhost";
-$_username = "mahdi";
-$_password = "123456";
-$_dbname = "store";
-try {
-    $conn = new PDO("mysql:host=$_servername;dbname=$_dbname", $_username, $_password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    # echo "connection successful";
+// $_servername = "localhost";
+// $_username = "mahdi";
+// $_password = "123456";
+// $_dbname = "store";
+// try {
+//     $conn = new PDO("mysql:host=$_servername;dbname=$_dbname", $_username, $_password);
+//     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+//     # echo "connection successful";
 
-    // $_command = "SELECT * FROM users;";
-    // $statement = $conn->prepare("$_command");
-    // $statement->execute();
-    // $result = $statement->setFetchMode(PDO::FETCH_ASSOC);
-    // $users = $statement->fetchAll(); #get all users
-    // foreach (new RecursiveArrayIterator($users) as $k => $v) {
-    //     #echo
-    // }
-} catch (PDOException $e) {
-    echo "connection failed" . $e->getMessage();
-}
+//     // $_command = "SELECT * FROM users;";
+//     // $statement = $conn->prepare("$_command");
+//     // $statement->execute();
+//     // $result = $statement->setFetchMode(PDO::FETCH_ASSOC);
+//     // $users = $statement->fetchAll(); #get all users
+//     // foreach (new RecursiveArrayIterator($users) as $k => $v) {
+//     //     #echo
+//     // }
+// } catch (PDOException $e) {
+//     echo "connection failed" . $e->getMessage();
+// }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -110,8 +111,7 @@ try {
                     <img src="https://colorlib.com/etc/lf/Login_v1/images/img-01.png" alt="IMG">
                 </div>
 
-                <form class="login100-form validate-form" action="<?php htmlspecialchars($_SERVER["PHP_SELF"]); ?>"
-                    method="POST" onsubmit=" validateForm(event)">
+                <form class="login100-form validate-form" action="<?php htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" onsubmit=" validateForm(event)">
                     <span class="login100-form-title">
                         Member Login
                     </span>
@@ -174,50 +174,50 @@ try {
     </div>
 </body>
 <script type="text/javascript">
-const validateForm = (event) => {
-    const email = document.getElementById('email');
-    const emailError = document.getElementById('emailError');
-    const password = document.getElementById('password');
-    const passwordError = document.getElementById('passwordError');
-    const flags = [];
-    // return true;
-    if (email.value.trim().length === 0) {
-        emailError.textContent = "JS Email Can't be empty!";
-        flags.push(false);
-    } else if (!isEmail(email.value)) {
-        emailError.textContent = "JS Wrong Email fromat";
-        flags.push(false);
-    } else {
+    const validateForm = (event) => {
+        const email = document.getElementById('email');
+        const emailError = document.getElementById('emailError');
+        const password = document.getElementById('password');
+        const passwordError = document.getElementById('passwordError');
+        const flags = [];
         // return true;
-        flags.push(true);
-        emailError.textContent = "JS no problem";
+        if (email.value.trim().length === 0) {
+            emailError.textContent = "JS Email Can't be empty!";
+            flags.push(false);
+        } else if (!isEmail(email.value)) {
+            emailError.textContent = "JS Wrong Email fromat";
+            flags.push(false);
+        } else {
+            // return true;
+            flags.push(true);
+            emailError.textContent = "JS no problem";
 
-    }
-
-    if (password.value.length === 0) {
-        passwordError.textContent = "JS Password can't be empty!";
-        flags.push(false);
-    } else if (password.value.length < 8) {
-        passwordError.textContent = "JS Password must be at least 8 characters";
-        flags.push(false);
-    } else {
-        passwordError.textContent = "JS no problem";
-        flags.push(true);
-    }
-
-    flags.forEach(flag => {
-        if (flag === false) {
-            event.preventDefault();
-            return false;
         }
-    });
-    return true;
-}
 
-function isEmail(email) {
-    return /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-        .test(email);
-}
+        if (password.value.length === 0) {
+            passwordError.textContent = "JS Password can't be empty!";
+            flags.push(false);
+        } else if (password.value.length < 8) {
+            passwordError.textContent = "JS Password must be at least 8 characters";
+            flags.push(false);
+        } else {
+            passwordError.textContent = "JS no problem";
+            flags.push(true);
+        }
+
+        flags.forEach(flag => {
+            if (flag === false) {
+                event.preventDefault();
+                return false;
+            }
+        });
+        return true;
+    }
+
+    function isEmail(email) {
+        return /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+            .test(email);
+    }
 </script>
 
 </html>
